@@ -29,27 +29,27 @@ target_compile_options(foo PRIVATE
 )
 
 
-set(CLIENT2_SOURCES
-    client2.c
+set(CLIENT_SOURCES
+    client.c
 )
 
-add_executable(tftp2 ${CLIENT2_SOURCES})
+add_executable(tftp ${CLIENT_SOURCES})
 
-target_compile_options(tftp2 PRIVATE
+target_compile_options(tftp PRIVATE
     ${DEFAULT_OPTIONS}
 )
 
-target_link_libraries(tftp2 PRIVATE foo)
+target_link_libraries(tftp PRIVATE foo)
 
 
-set(SERVER2_SOURCES
-    server2.c
+set(SERVER_SOURCES
+    server.c
 )
 
-add_executable(tftpd2 ${SERVER2_SOURCES})
+add_executable(tftpd ${SERVER_SOURCES})
 
-target_compile_options(tftpd2 PRIVATE
+target_compile_options(tftpd PRIVATE
     ${DEFAULT_OPTIONS}
 )
 
-target_link_libraries(tftpd2 PRIVATE foo)
+target_link_libraries(tftpd PRIVATE foo)
