@@ -29,23 +29,6 @@ target_compile_options(foo PRIVATE
 )
 
 
-
-
-set(CLIENT_SOURCES
-    client.c
-)
-
-add_executable(tftp ${CLIENT_SOURCES})
-
-target_compile_options(tftp PRIVATE
-    ${DEFAULT_OPTIONS}
-)
-
-target_link_libraries(tftp PRIVATE foo)
-
-
-
-
 set(CLIENT2_SOURCES
     client2.c
 )
@@ -57,23 +40,6 @@ target_compile_options(tftp2 PRIVATE
 )
 
 target_link_libraries(tftp2 PRIVATE foo)
-
-
-
-
-set(SERVER_SOURCES
-    server.c
-)
-
-add_executable(tftpd ${SERVER_SOURCES})
-
-target_compile_options(tftpd PRIVATE
-    ${DEFAULT_OPTIONS}
-)
-
-target_link_libraries(tftpd PRIVATE foo)
-
-
 
 
 set(SERVER2_SOURCES
