@@ -79,11 +79,6 @@ typedef unsigned short tid_t;
 #define MAX_FILENAME 512
 #define RECV_TIMEOUT 10
 
-struct connection {
-    int sock;
-    struct sockaddr_in endpoint;
-};
-
 size_t create_initial_packet(char* packet, const char* filename, mode_t mode, opcode_t opcode);
 size_t create_ack_packet(char* packet, bnum_t blocknumber);
 size_t create_data_packet(char* packet, bnum_t blocknumber, char* data, ssize_t size);
