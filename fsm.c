@@ -65,6 +65,11 @@ state_t do_state_initial_server(session_data_t* data) {
 
     if (IS_RRQ(opcode)) {
         data->role = ROLE_WRITER;
+        if (!file_exists(filename)) {
+            data->packet_size = create_error_packet(data->packet, ENOTFOUND);
+            data->complete = 1;
+            return STATE_SEND;
+        }
         if ((data->fd = open(filename, O_RDONLY)) < 0) {
             data->packet_size = create_error_packet(data->packet, ENODEF);
             data->complete = 1;
