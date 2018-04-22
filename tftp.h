@@ -22,7 +22,6 @@
 #define IS_ACK(op) ((op) == OP_ACK)
 #define OP_ERROR 5
 #define IS_ERROR(op) ((op) == OP_ERROR)
-#define IS_NOOP(op) ((op) < 1 || (op) > 5)
 
 typedef unsigned short opcode_t;
 
