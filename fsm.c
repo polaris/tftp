@@ -70,6 +70,11 @@ state_t do_state_initial_server(session_data_t* data) {
             data->complete = 1;
             return STATE_SEND;
         }
+        if (!file_read_ok(filename)) {
+            data->packet_size = create_error_packet(data->packet, ENOACCESS);
+            data->complete = 1;
+            return STATE_SEND;
+        }
         if ((data->fd = open(filename, O_RDONLY)) < 0) {
             data->packet_size = create_error_packet(data->packet, ENODEF);
             data->complete = 1;
@@ -89,6 +94,11 @@ state_t do_state_initial_server(session_data_t* data) {
         data->role = ROLE_READER;
         if (file_exists(filename)) {
             data->packet_size = create_error_packet(data->packet, EEXISTA);
+            data->complete = 1;
+            return STATE_SEND;
+        }
+        if (!file_write_ok(filename)) {
+            data->packet_size = create_error_packet(data->packet, ENOACCESS);
             data->complete = 1;
             return STATE_SEND;
         }
@@ -112,12 +122,20 @@ state_t do_state_initial_client(session_data_t* data) {
             print_application_error("source file does not exist");
             return STATE_EXIT;
         }
+        if (!file_read_ok(data->filename)) {
+            print_application_error("source file is not readable");
+            return STATE_EXIT;
+        }
         if ((data->fd = open(data->filename, O_RDONLY)) < 0) {
             print_system_error("failed to open source file");
             return STATE_EXIT;
         }
         opcode = OP_WRQ;
     } else {
+        if (!file_write_ok(data->filename)) {
+            print_application_error("source file is not writable");
+            return STATE_EXIT;
+        }
         if ((data->fd = open(data->filename, O_WRONLY | O_CREAT, 0666)) < 0) {
             print_system_error("failed to open destination file");
             return STATE_EXIT;
