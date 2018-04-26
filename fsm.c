@@ -196,6 +196,13 @@ state_t handle_data(session_data_t* data) {
         return STATE_SEND;
     }
 
+    if (get_free_space(data->filename) < data->packet_size-4) {
+        print_application_error("disk full");
+        data->packet_size = create_error_packet(data->packet, EDISKFULL);
+        data->complete = 1;
+        return STATE_SEND;
+    }
+
     if (write(data->fd, data->packet+4, (size_t)(data->packet_size-4)) < 0) {
         print_system_error("failed to write data to disk");
         data->packet_size = create_error_packet(data->packet, ENODEF);
