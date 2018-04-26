@@ -63,6 +63,7 @@ void handle_client_request(char* initial_request, size_t initial_request_size, s
 
     bzero(&data, sizeof(data));
     data.peer = client;
+    data.tid = ntohs(client.sin_port);
     memcpy(data.packet, initial_request, initial_request_size);
 
     cur_state = STATE_INITIAL_SERVER;

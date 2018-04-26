@@ -14,6 +14,7 @@ typedef struct session_data {
     bnum_t blocknumber;
     role_t role;
     mode_t mode;
+    tid_t tid;
     char packet[BSIZE];
     char filename[MAX_FILENAME];
     struct sockaddr_in peer;

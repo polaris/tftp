@@ -264,16 +264,26 @@ state_t do_state_send(session_data_t* data) {
 }
 
 state_t do_state_wait(session_data_t* data) {
-    socklen_t client_len;
+    socklen_t peer_len;
     ssize_t count;
 
-    client_len = sizeof(data->peer);
-    count = recvfrom(data->sock, data->packet, BSIZE, 0, (struct sockaddr *)&data->peer, &client_len);
+    peer_len = sizeof(data->peer);
+    count = recvfrom(data->sock, data->packet, BSIZE, 0, (struct sockaddr *)&data->peer, &peer_len);
     if (count < 0) {
         data->packet_size = create_error_packet(data->packet, ENODEF);
         data->complete = 1;
         return STATE_SEND;
     }
+
+    if (data->tid == 0) {
+        data->tid = ntohs(data->peer.sin_port);
+    }
+
+    if (ntohs(data->peer.sin_port) != data->tid) {
+        data->packet_size = create_error_packet(data->packet, EUNKNOWN);
+        return STATE_SEND;
+    }
+
     data->packet_size = (size_t)count;
 
     return STATE_RECEIVE;
