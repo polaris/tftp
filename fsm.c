@@ -262,9 +262,10 @@ state_t do_state_send(session_data_t* data) {
 }
 
 state_t do_state_wait(session_data_t* data) {
-    socklen_t client_len = sizeof(data->peer);
+    socklen_t client_len;
     ssize_t count;
 
+    client_len = sizeof(data->peer);
     count = recvfrom(data->sock, data->packet, BSIZE, 0, (struct sockaddr *)&data->peer, &client_len);
     if (count < 0) {
         data->packet_size = create_error_packet(data->packet, ENODEF);
