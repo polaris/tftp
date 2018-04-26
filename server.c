@@ -47,7 +47,6 @@ int main() {
         }
 
         if (fork() == 0) { // Child process
-            printf("process forked\n");
             close(sock);
             handle_client_request(packet, (size_t)count, client);
             break;
