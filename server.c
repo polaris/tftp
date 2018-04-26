@@ -6,6 +6,7 @@ void handle_client_request(char* initial_request, size_t initial_request_size, s
 
 int main() {
     int sock;
+    int enable;
     ssize_t count;
     socklen_t client_len;
     struct sockaddr_in server, client;
@@ -16,6 +17,13 @@ int main() {
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
         perror("creating stream socket");
+        exit(1);
+    }
+
+    enable = 1;
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+        perror("set socket option SO_REUSEADDR");
+        close(sock);
         exit(1);
     }
 
