@@ -16,13 +16,13 @@ int main() {
 
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
-        perror("creating stream socket");
+        print_system_error("failed to create socket");
         exit(1);
     }
 
     enable = 1;
     if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
-        perror("set socket option SO_REUSEADDR");
+        print_system_error("failed to set socket option SO_REUSEADDR");
         close(sock);
         exit(1);
     }
@@ -32,7 +32,7 @@ int main() {
     server.sin_addr.s_addr = htonl(INADDR_ANY);
     server.sin_port = htons(TFTP_PORT);
     if (bind(sock, (struct sockaddr *) &server, sizeof (server)) < 0) {
-        perror("binding socket");
+        print_system_error("failed to bind socket");
         close(sock);
         exit(1);
     }
