@@ -132,9 +132,11 @@ state_t do_state_initial_client(session_data_t* data) {
         }
         opcode = OP_WRQ;
     } else {
-        if (!file_write_ok(data->filename)) {
-            print_application_error("source file is not writable");
-            return STATE_EXIT;
+        if (file_exists(data->filename)) {
+            if (!file_write_ok(data->filename)) {
+                print_application_error("source file is not writable");
+                return STATE_EXIT;
+            }
         }
         if ((data->fd = open(data->filename, O_WRONLY | O_CREAT, 0666)) < 0) {
             print_system_error("failed to open destination file");
