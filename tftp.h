@@ -17,11 +17,8 @@
 #define OP_WRQ   2
 #define IS_WRQ(op) ((op) == OP_WRQ)
 #define OP_DATA  3
-#define IS_DATA(op) ((op) == OP_DATA)
 #define OP_ACK   4
-#define IS_ACK(op) ((op) == OP_ACK)
 #define OP_ERROR 5
-#define IS_ERROR(op) ((op) == OP_ERROR)
 
 typedef unsigned short opcode_t;
 
