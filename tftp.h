@@ -13,12 +13,13 @@
 #include <unistd.h>
 
 #define OP_RRQ   1
-#define IS_RRQ(op) ((op) == OP_RRQ)
 #define OP_WRQ   2
-#define IS_WRQ(op) ((op) == OP_WRQ)
 #define OP_DATA  3
 #define OP_ACK   4
 #define OP_ERROR 5
+
+#define IS_RRQ(op) ((op) == OP_RRQ)
+#define IS_WRQ(op) ((op) == OP_WRQ)
 
 typedef unsigned short opcode_t;
 
