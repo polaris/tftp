@@ -3,7 +3,15 @@
 
 #include "tftp.h"
 
-typedef enum { STATE_INITIAL_SERVER, STATE_INITIAL_CLIENT, STATE_RECEIVE, STATE_SEND, STATE_WAIT, STATE_EXIT, NUM_STATES } state_t;
+typedef enum {
+    STATE_INITIAL_SERVER,
+    STATE_INITIAL_CLIENT,
+    STATE_RECEIVE,
+    STATE_SEND,
+    STATE_WAIT,
+    STATE_EXIT,
+    NUM_STATES
+} state_t;
 
 typedef struct session_data {
     int sock;
