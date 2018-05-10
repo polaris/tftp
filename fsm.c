@@ -60,6 +60,8 @@ state_t do_state_initial_server(session_data_t* data) {
         return STATE_SEND;
     }
 
+    data->mode = parse_mode(data->packet);
+
     bzero(filename, MAX_FILENAME);
     parse_filename(data->packet, data->packet_size, filename);
 
@@ -146,6 +148,10 @@ state_t do_state_initial_client(session_data_t* data) {
     }
 
     data->packet_size = create_initial_packet(data->packet, data->filename, data->mode, opcode);
+    if (data->packet_size == 0) {
+        print_application_error("failed to create initial packet");
+        return STATE_EXIT;
+    }
 
     return STATE_SEND;
 }
@@ -154,6 +160,9 @@ state_t handle_ack(session_data_t* data) {
     bnum_t blocknumber;
     ssize_t size;
     char buffer[DATASIZE];
+    char* p;
+    char c;
+    int i;
 
     if (!IS_WRITER(data->role)) {
         print_application_error("illegal opcode received");
@@ -171,13 +180,41 @@ state_t handle_ack(session_data_t* data) {
     }
 
     bzero(buffer, DATASIZE);
-    size = read(data->fd, buffer, DATASIZE);
-    if (size < 0) {
-        print_system_error("failed to read data from file");
-        data->packet_size = create_error_packet(data->packet, ENODEF);
-        data->complete = 1;
-        return STATE_SEND;
+    if (IS_MODE_OCTET(data->mode)) {
+        printf("octet\n");
+        size = read(data->fd, buffer, DATASIZE);
+        if (size < 0) {
+            print_system_error("failed to read data from file");
+            data->packet_size = create_error_packet(data->packet, ENODEF);
+            data->complete = 1;
+            return STATE_SEND;
+        }
+    } else {
+        p = buffer;
+        for (i = 0; i < DATASIZE; i++) {
+            if (data->newline) {
+                if (data->prevchar == '\n') {
+                    c = '\n';
+                } else {
+                    c = '\0';
+                }
+                data->newline = 0;
+            } else {
+                size = read(data->fd, &c, 1);
+                if (c == EOF) {
+                    break;
+                }
+                if (c == '\n' || c == '\r') {
+                    data->prevchar = c;
+                    c = '\r';
+                    data->newline = 1;
+                }
+            }
+            *p++ = c;
+        }
+        size = p - buffer;
     }
+
     data->blocknumber += 1;
     data->packet_size = create_data_packet(data->packet, data->blocknumber, buffer, size);
 
@@ -190,6 +227,9 @@ state_t handle_ack(session_data_t* data) {
 
 state_t handle_data(session_data_t* data) {
     bnum_t blocknumber;
+    char* p;
+    char c;
+    size_t count;
 
     if (!IS_READER(data->role)) {
         print_application_error("illegal opcode received");
@@ -205,11 +245,30 @@ state_t handle_data(session_data_t* data) {
         return STATE_SEND;
     }
 
-    if (write(data->fd, data->packet+4, (size_t)(data->packet_size-4)) < 0) {
-        print_system_error("failed to write data to disk");
-        data->packet_size = create_error_packet(data->packet, ENODEF);
-        data->complete = 1;
-        return STATE_SEND;
+    if (IS_MODE_OCTET(data->mode)) {
+        printf("octet\n");
+        if (write(data->fd, data->packet+4, (size_t)(data->packet_size-4)) < 0) {
+            print_system_error("failed to write data to disk");
+            data->packet_size = create_error_packet(data->packet, ENODEF);
+            data->complete = 1;
+            return STATE_SEND;
+        }
+    } else {
+        count = data->packet_size - 4;
+        p  = data->packet + 4;
+        while (count--) {
+            c = *p++;
+            if (data->prevchar == '\r') {
+                if (c == '\n') {
+                    lseek(data->fd, -1, SEEK_CUR);
+                } else if (c == '\0') {
+                    goto skipit;
+                }
+            }
+            write(data->fd, &c, 1);
+        skipit:
+            data->prevchar = c;
+        }
     }
 
     blocknumber = parse_blocknumber(data->packet);

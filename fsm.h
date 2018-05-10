@@ -26,6 +26,8 @@ typedef struct session_data {
     char packet[BSIZE];
     char filename[MAX_FILENAME];
     struct sockaddr_in peer;
+    char prevchar;
+    int newline;
 } session_data_t;
 
 state_t run_state(state_t cur_state, session_data_t* data);

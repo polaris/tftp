@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <getopt.h>
+#include <limits.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,8 +24,10 @@
 
 typedef unsigned short opcode_t;
 
-#define MODE_NETASCII 1
-#define MODE_OCTET    2
+#define MODE_NETASCII 0
+#define MODE_OCTET    1
+
+#define IS_MODE_OCTET(mode) ((mode) == MODE_OCTET)
 
 static const char* modes[2] = {
     "netascii",
@@ -82,9 +85,11 @@ size_t create_data_packet(char* packet, bnum_t blocknumber, char* data, ssize_t 
 size_t create_error_packet(char* packet, ecode_t error_code);
 
 opcode_t parse_opcode(char* packet);
+mode_t parse_mode(char* packet);
 bnum_t parse_blocknumber(char* packet);
 ecode_t parse_errcode(char* packet);
 void parse_filename(char* packet, size_t size, char filename[MAX_FILENAME]);
+size_t parse_data(char* packet, size_t packet_size, char data[DATASIZE]);
 void parse_errmsg(char* packet, size_t size, char errmsg[MAX_ERRMSG]);
 
 #endif

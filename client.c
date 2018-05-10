@@ -14,17 +14,18 @@ int main(int argc, char* argv[]) {
     char command[4];
     char address[255];
     char filename[MAX_FILENAME];
-    int ch, a, f, c;
+    int ch, a, f, c, netascii;
 
     static struct option longopts[] = {
         { "address",  required_argument, NULL, 'a' },
         { "filename", required_argument, NULL, 'r' },
         { "commnad",  required_argument, NULL, 'c' },
+        { "netascii", no_argument,       NULL, 'n' },
         { "help",     no_argument,       NULL, 'h' },
         { NULL,       0,                 NULL, 0   }
     };
 
-    a = f = c = 0;
+    a = f = c = netascii = 0;
 
     while ((ch = getopt_long(argc, argv, "a:f:c:m:h", longopts, NULL)) != -1) {
         switch (ch) {
@@ -43,6 +44,9 @@ int main(int argc, char* argv[]) {
         case 'h':
             usage(argv[0]);
             exit(0);
+        case 'n':
+            netascii = 1;
+            break;
         case 0:
             break;
         default:
@@ -94,6 +98,7 @@ int main(int argc, char* argv[]) {
     memcpy(&data.peer.sin_addr.s_addr, host->h_addr, host->h_length);
     data.peer.sin_port = htons(TFTP_PORT);
 
+    // data.mode = netascii == 1 ? MODE_NETASCII : MODE_OCTET;
     data.mode = MODE_OCTET;
 
     strncpy(data.filename, filename, MAX_FILENAME);

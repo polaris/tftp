@@ -53,3 +53,7 @@ target_compile_options(tftpd PRIVATE
 )
 
 target_link_libraries(tftpd PRIVATE foo)
+
+# if(testing_enabled)
+    add_subdirectory(tests)
+# endif()
