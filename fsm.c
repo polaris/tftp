@@ -181,7 +181,6 @@ state_t handle_ack(session_data_t* data) {
 
     bzero(buffer, DATASIZE);
     if (IS_MODE_OCTET(data->mode)) {
-        printf("octet\n");
         size = read(data->fd, buffer, DATASIZE);
         if (size < 0) {
             print_system_error("failed to read data from file");
@@ -246,7 +245,6 @@ state_t handle_data(session_data_t* data) {
     }
 
     if (IS_MODE_OCTET(data->mode)) {
-        printf("octet\n");
         if (write(data->fd, data->packet+4, (size_t)(data->packet_size-4)) < 0) {
             print_system_error("failed to write data to disk");
             data->packet_size = create_error_packet(data->packet, ENODEF);
