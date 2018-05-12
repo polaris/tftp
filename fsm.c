@@ -2,6 +2,8 @@
 #include "util.h"
 #include "print.h"
 
+#include <libgen.h>
+
 state_t do_state_initial_server(session_data_t* data);
 state_t do_state_initial_client(session_data_t* data);
 state_t do_state_receive(session_data_t* data);
@@ -29,6 +31,7 @@ state_t do_state_initial_server(session_data_t* data) {
     ssize_t size;
     char buffer[DATASIZE];
     char filename[MAX_FILENAME];
+    char* dir;
 
     data->sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (data->sock < 0) {
@@ -99,7 +102,15 @@ state_t do_state_initial_server(session_data_t* data) {
             data->complete = 1;
             return STATE_SEND;
         }
-        if (!file_write_ok(filename)) {
+        dir = dirname(filename);
+        if (dir == NULL) {
+            print_system_error("failed to get dir name from filename");
+            data->packet_size = create_error_packet(data->packet, ENODEF);
+            data->complete = 1;
+            return STATE_SEND;
+        }
+        if (!file_write_ok(dir)) {
+            printf("%s\n", dir);
             data->packet_size = create_error_packet(data->packet, ENOACCESS);
             data->complete = 1;
             return STATE_SEND;
@@ -227,6 +238,7 @@ state_t handle_ack(session_data_t* data) {
 state_t handle_data(session_data_t* data) {
     bnum_t blocknumber;
     char* p;
+    char* dir;
     char c;
     size_t count;
 
@@ -237,7 +249,15 @@ state_t handle_data(session_data_t* data) {
         return STATE_SEND;
     }
 
-    if (get_free_space(data->filename) < data->packet_size-4) {
+    dir = dirname(data->filename);
+    if (dir == NULL) {
+        print_system_error("failed to get dir name from filename");
+        data->packet_size = create_error_packet(data->packet, ENODEF);
+        data->complete = 1;
+        return STATE_SEND;
+    }
+
+    if (get_free_space(dir) < data->packet_size-4) {
         print_application_error("disk full");
         data->packet_size = create_error_packet(data->packet, EDISKFULL);
         data->complete = 1;
