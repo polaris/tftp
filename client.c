@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     char filename[MAX_FILENAME];
     int ch, a, f, c, netascii;
 
-    static struct option longopts[] = {
+    struct option longopts[] = {
         { "address",  required_argument, NULL, 'a' },
         { "filename", required_argument, NULL, 'r' },
         { "commnad",  required_argument, NULL, 'c' },
