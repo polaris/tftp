@@ -1,7 +1,6 @@
 #include "fsm.h"
 #include "util.h"
 #include "print.h"
-
 #include <libgen.h>
 
 state_t do_state_initial_server(session_data_t* data);
