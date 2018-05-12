@@ -210,7 +210,7 @@ state_t handle_ack(session_data_t* data) {
                 data->newline = 0;
             } else {
                 size = read(data->fd, &c, 1);
-                if (c == EOF) {
+                if (size == 0) {
                     break;
                 }
                 if (c == '\n' || c == '\r') {
