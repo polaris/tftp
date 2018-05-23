@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
     memcpy(&data.peer.sin_addr.s_addr, host->h_addr, host->h_length);
     data.peer.sin_port = htons(TFTP_PORT);
 
-    data.mode = netascii == 1 ? MODE_NETASCII : MODE_OCTET;
+    data.mode = (mode_t)(netascii == 1 ? MODE_NETASCII : MODE_OCTET);
 
     strncpy(data.filename, filename, MAX_FILENAME);
 
